@@ -5,54 +5,80 @@ import plotly_express as px
 
 '''
 # Climate Change V 1.0
-Interactive web app to assess energy consumption per country
+Interactive web app to assess energy consumption per country.  
+There could be discrepancies due to insufficient data recording for some years and/or countries
+  
+  
+  
 '''
-dfa=st.cache(pd.read_csv)("country_energy.csv") #1st file energy consumption per capita
-dfb=st.cache(pd.read_csv)("fossil.csv")#2nd file fossil fuel
-dfc=st.cache(pd.read_csv)("CO2.csv")
-#st.write(dfa)
-lista_paesi=dfa['Country Name'] #it's the same list
-lista=lista_paesi.values.tolist()
-country=st.sidebar.selectbox('SELECT_COUNTRY',lista_paesi)
-period=st.sidebar.slider("period",1960,2021, (1960,2021))
-st.write(period)
-firsty=period[0]
-sndy=period[1]
-st.write(firsty)
-st.write(sndy)
-#country=(country[0])->only if multiselect
-years = range(firsty,sndy+1)
-b=sndy
-st.write(b)
-a=lista.index(country)
-emissionsa= dfa.iloc[a+2,4:(b+5)] #emission for dfa
-emissionsb= dfb.iloc[a+2,4:(b+5)] #emission for dfb
-emissionsc= dfc.iloc[a+2,4:(b+5)]#emissions CO2 dfc
-figa=px.line(x=years, y=emissionsa) #it'd be useful to add a checkbox to display everything or only a part
-figa.update_layout(
-    title="Energy Consumption PC"+" "+country,
+
+energy_df=st.cache(pd.read_csv)("country_energy.csv") #1st file energy consumption per capita
+fossil_df=st.cache(pd.read_csv)("fossil.csv") #2nd file fossil fuel energy %
+co2_df=st.cache(pd.read_csv)("CO2.csv") #3rd file CO2 emissions
+renewables_df=st.cache(pd.read_csv)("RENEWABLES.csv") #4th file renewables energy %
+
+country_list=energy_df['Country Name'].values.tolist() #each df has the same country list
+
+#data selection
+country=st.sidebar.selectbox('Country',country_list)
+period=st.sidebar.slider("Period",1960,2020, (1960,2020))
+min_year=period[0]
+max_year=period[1]
+st.write("You selected data regarding", country, "between", min_year, "and", max_year)
+
+#data retrieval
+years_range = range(min_year, max_year+1)
+country_index = country_list.index(country)
+min_year_index = min_year-1956 #index for 1960 is 4; for '61 is 5; for '62 is 6; etc
+max_year_index = max_year-1956 #same as above
+energy = energy_df.iloc[country_index, min_year_index:max_year_index+1]
+fossil = fossil_df.iloc[country_index, min_year_index:max_year_index+1]
+co2 = co2_df.iloc[country_index, min_year_index:max_year_index+1]
+renewables = renewables_df.iloc[country_index, min_year_index:max_year_index+1]
+
+#graphs
+energy_graph=px.line(x=years_range, y=energy)
+energy_graph.update_layout(
+    title="Energy Consumption (as kg of oil equivalent) Per Capita In " + country,
     xaxis_title="period",
-    yaxis_title="emissions",
-)#px.line, Line Plot with plotly.express
-#Plotly Express is the easy-to-use, high-level interface to Plotly, which operates on a variety of types of data and produces easy-to-style figures. With px.line, each data point is represented as a vertex (which location is given by the x and y columns) of a polyline mark in 2D space.
-
-
-st.plotly_chart(figa)
-figb=px.line(x=years, y=emissionsb)
-figb.update_layout(
-    title="Fossil Fuel Consumption PC in"+" "+country,
+    yaxis_title="energy use",
+)
+st.plotly_chart(energy_graph)
+my_expander = st.beta_expander('Show more')
+my_expander.write('INFO DA METTERE')
+'''
+&nbsp;
+'''
+fossil_graph=px.line(x=years_range, y=fossil)
+fossil_graph.update_layout(
+    title="Percentage Of Energy Derived From Fossil Fuels In " + country,
+    xaxis_title="period",
+    yaxis_title="%",
+)
+st.plotly_chart(fossil_graph)
+my_expander = st.beta_expander('Show more')
+my_expander.write('INFO DA METTERE')
+'''
+&nbsp;
+'''
+renewables_graph=px.line(x=years_range, y=renewables)
+renewables_graph.update_layout(
+    title="Percentage Of Energy Derived From Renewable Sources In " + country,
+    xaxis_title="period",
+    yaxis_title="%"
+)
+st.plotly_chart(renewables_graph)
+my_expander = st.beta_expander('Show more')
+my_expander.write('INFO DA METTERE')
+'''
+&nbsp;
+'''
+co2_graph=px.line(x=years_range, y=co2)
+co2_graph.update_layout(
+    title="CO2 Emissions (in Kt) In " + country,
     xaxis_title="period",
     yaxis_title="emissions",
 )
-st.plotly_chart(figb)
-
-figc=px.line(x=years, y=emissionsc)
-figc.update_layout(
-    title="CO2 emissions in"+" "+country,
-    xaxis_title="period",
-    yaxis_title="emissions",
-)
-st.plotly_chart(figc)
-
-#In questo grafico riusciamo a vedere quelle che sono le emissioni.
-
+st.plotly_chart(co2_graph)
+my_expander = st.beta_expander('Show more')
+my_expander.write('INFO DA METTERE')
