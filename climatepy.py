@@ -49,6 +49,28 @@ fossil = fossil_df.iloc[country_indexes, min_year_index:max_year_index+1]
 co2 = co2_df.iloc[country_indexes, min_year_index:max_year_index+1]
 renewables = renewables_df.iloc[country_indexes, min_year_index:max_year_index+1]
 
+#city capital lat lon map
+def findGeocode(city): 
+    try: 
+        geolocator = Nominatim(user_agent="climate") 
+        return geolocator.geocode(city) 
+    except GeocoderTimedOut: 
+        return findGeocode(city)
+cap_list=[]
+lat=[]
+lon=[]
+for country in countries:
+    capital=CountryInfo(country)
+    capital=capital.capital()
+    cap_list.append(capital)
+    #cap_list.append(CountryInfo(country))
+for i in cap_list:
+    loc=findGeocode(i)
+    lat.append(loc.latitude)
+    lon.append(loc.longitude)
+st.write(lat)
+st.write(lon)
+
 #graphs
 energy_graph=px.line(x=years_range, y=energy_mult) #color=countries)
 energy_graph.update_layout(
