@@ -60,10 +60,12 @@ cap_list=[]
 lat=[]
 lon=[]
 for country in countries:
-    capital=CountryInfo(country)
-    capital=capital.capital()
-    cap_list.append(capital)
-    #cap_list.append(CountryInfo(country))
+    try:
+        capital=CountryInfo(country)
+        capital=capital.capital()
+        cap_list.append(capital)
+    except:
+        pass
 for i in cap_list:
     loc=findGeocode(i)
     lat.append(loc.latitude)
