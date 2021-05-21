@@ -43,8 +43,15 @@ energy = energy.T #inverts axes
 energy_mult = []
 for country in countries:
     energy_mult.append((energy_df.iloc[country_list.index(country), min_year_index:max_year_index+1]).tolist())
-st.write(energy)
-st.write(energy_mult)
+energysum=[]
+for country in energy_mult:
+    sumens = 0
+    for year in country:
+        if np.isnan(year) == False:
+            sumens += year
+    energysum.append(sumens)
+st.write('aaaaaa')
+st.write(energysum)
 fossil = fossil_df.iloc[country_indexes, min_year_index:max_year_index+1]
 co2 = co2_df.iloc[country_indexes, min_year_index:max_year_index+1]
 renewables = renewables_df.iloc[country_indexes, min_year_index:max_year_index+1]
@@ -59,11 +66,18 @@ def findGeocode(city):
 cap_list=[]
 lat=[]
 lon=[]
+iso=[]
+value=[]
 for country in countries:
     try:
         capital=CountryInfo(country)
         capital=capital.capital()
         cap_list.append(capital)
+        code=CountryInfo(country)
+        code=code.iso(3)
+        iso.append(code)
+        a=1
+        value.append(a)
     except:
         pass
 for i in cap_list:
@@ -72,6 +86,17 @@ for i in cap_list:
     lon.append(loc.longitude)
 st.write(lat)
 st.write(lon)
+df_location=pd.DataFrame(list(zip(lat,lon)),columns=["lat","lon"])
+st.write(country_list)
+df_coucode=pd.DataFrame(list(zip(iso,countries,energysum)),columns=["iso","country","value"])
+st.write(df_coucode)
+st.sidebar.map(df_location)
+figcol=go.Figure(data=go.Choropleth(
+    locations=df_coucode['iso'],
+    z=df_coucode['value'],
+    #color="Blue",
+))
+st.write(figcol)
 
 #graphs
 energy_graph=px.line(x=years_range, y=energy_mult) #color=countries)
