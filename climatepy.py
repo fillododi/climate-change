@@ -2,6 +2,11 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly_express as px
+from countryinfo import CountryInfo
+from geopy.exc import GeocoderTimedOut
+from geopy.geocoders import Nominatim
+import plotly.graph_objects as go
+
 
 '''
 # Climate Change V 1.0
@@ -43,6 +48,7 @@ energy = energy.T #inverts axes
 energy_mult = []
 for country in countries:
     energy_mult.append((energy_df.iloc[country_list.index(country), min_year_index:max_year_index+1]).tolist())
+st.write(energy_mult)
 energysum=[]
 for country in energy_mult:
     sumens = 0
@@ -133,7 +139,7 @@ renewables_graph.update_layout(
 st.plotly_chart(renewables_graph)
 my_expander = st.beta_expander('Show more')
 my_expander.write('INFO DA METTERE')
-'''
+''' 
 &nbsp;
 '''
 co2_graph=px.line(x=years_range, y=co2)
